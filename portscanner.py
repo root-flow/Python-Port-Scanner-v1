@@ -1,21 +1,77 @@
-<pre style="background: rgb(238, 238, 238); border: 1px dashed rgb(153, 153, 153); line-height: 14px; outline: 0px; overflow: auto; padding: 5px; vertical-align: baseline; width: 592.016px;"><code style="background-attachment: initial; background-clip: initial; background-color: #f1f1f1; background-origin: initial; background-position: 0% 0%; background-repeat: no-repeat; background-size: initial; background: url("images/code.gif") left top no-repeat rgb(241, 241, 241); border-color: rgb(221, 221, 221); border-image: initial; border-style: dotted dotted dotted solid; border-width: 1px 1px 1px 10px; display: block; margin: 0px; outline: 0px; padding: 20px; vertical-align: baseline;">import socket
+#!/usr/bin/env python
 
-site = input("Tarancak siteyi giriniz : ")
-target = socket.gethostbyname(site)
+#-*-coding:utf-8-*-
 
-print("-" * 50)
-print("Hedef taranıyor: " + target)
-print("-" * 50)
+import socket
+
+import subprocess
+
+import sys
+
+from datetime import datetime
+
+subprocess.call('clear', shell=True)#Ekranı Temizle
 
 try:
-    for port in range(1, 65535):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        socket.setdefaulttimeout(1)
-        result = s.connect_ex((target, port))
+
+    remoteServer    = raw_input("Tarama yapılacak siteyi veya İp Adresini Giriniz: ")# Girdi Al
+
+    remoteServerIP  = socket.gethostbyname(remoteServer)
+
+    # Taramayla ilgili bilgi veriliyor hangi ip'yi taradığımızı gösteriyor...
+
+    print "-" * 60
+
+    print "Lütfen bekleyiniz,tarama yapılıyor...", remoteServerIP
+
+    print "-" * 60
+
+    t1 = datetime.now()#Taramaya başladığındaki zamanı alıyoruz...
+
+    try:
+
+        for port in range(1,1024):#Portları 1-1023'e kadar tarıyoruz..
+
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            result = sock.connect_ex((remoteServerIP, port))
+
+            if result == 0:
+
+                print "Port {}: 	 Açık".format(port)            sock.close()
+
+    #Bu exceptleri koymamızın sebebi programın kırılmasını önlüyoruz.
+
+    except KeyboardInterrupt:#Ctrl+c basıp basmadığımızı kontrol ediyoruz.
+
+        print "Ctrl+C'ye bastınız..."
+
+        sys.exit()#program sonlandırılıyor..
+
+    except socket.error:#Servera bağlanıp bağlanılmadığını kontrol ediyoruz.
+
+        print "Server'a bağlanılamadı."
+
+        sys.exit()
+
+    t2 = datetime.now()# İkinci kere zaman alınıyor.
+
+    total =  t2 - t1 #Tarama işleminin ne kadar sürdüğünü buluyoruz.
+
+    # Bilgiler Ekrana basılıyor..
+
+    print ("Tarama:{} sürede tamamlandı".format(total))
+
+except socket.gaierror:
+
+    sys.stderr.write("Girilen Değer {} uygun formatta değil!!!!\n".format(remoteServer))
+    
+       
+      
+       
         
-        if result == 0:
-            print("Port {} açık.".format(port))
-        s.close()
-        
-except Exception as e:
-    print("Hata!", e)
+       
+            
+      
+       
+   
